@@ -1,5 +1,3 @@
-import { type } from "@testing-library/user-event/dist/type";
-
 function ScreenToStart({ numQuestions, dispatch }) {
   return (
     <div className="start">

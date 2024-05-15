@@ -88,6 +88,9 @@ export default function App() {
     async function fetchData() {
       try {
         const response = await fetch("/.netlify/functions/fetchData");
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
         const data = await response.json();
         dispatch({ type: "dataRecived", payload: data });
       } catch (error) {

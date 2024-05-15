@@ -87,9 +87,9 @@ export default function App() {
   useEffect(function () {
     async function fetchData() {
       try {
-        const res = await fetch("http://localhost:9000/questions");
-        const data = await res.json();
-        dispatch({ type: "dataRecived", payload: data });
+        const response = await fetch("/.netlify/functions/fetchData");
+        const result = await response.json();
+        dispatch({ type: "dataRecived", payload: result });
       } catch (error) {
         dispatch({ type: "dataFailed" });
       }

@@ -3,13 +3,15 @@ const path = require("path");
 
 exports.handler = async (event, context) => {
   try {
-    const dataPath = path.resolve(__dirname, "./questions.json");
+    const dataPath = path.resolve(__dirname, "questions.json");
+    console.log("Resolved data path:", dataPath);
     const data = await fs.readFile(dataPath, "utf-8");
     return {
       statusCode: 200,
       body: data,
     };
   } catch (error) {
+    console.error("Error reading data:", error); // Log the error
     return {
       statusCode: 500,
       body: JSON.stringify({ error: "Failed to read data" }),

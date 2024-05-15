@@ -4,7 +4,6 @@ const path = require("path");
 exports.handler = async (event, context) => {
   try {
     const dataPath = path.resolve(__dirname, "questions.json");
-    console.log("Resolved data path:", dataPath);
     const data = await fs.readFile(dataPath, "utf-8");
     return {
       statusCode: 200,

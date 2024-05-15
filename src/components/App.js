@@ -88,8 +88,8 @@ export default function App() {
     async function fetchData() {
       try {
         const response = await fetch("/.netlify/functions/fetchData");
-        const result = await response.json();
-        dispatch({ type: "dataRecived", payload: result });
+        const data = await response.json();
+        dispatch({ type: "dataRecived", payload: data });
       } catch (error) {
         dispatch({ type: "dataFailed" });
       }

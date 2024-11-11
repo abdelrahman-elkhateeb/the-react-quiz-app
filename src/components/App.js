@@ -1,9 +1,10 @@
 import { useEffect, useReducer } from "react";
+
 import Header from "./Header";
 import Main from "./Main";
 import Loader from "./Loader";
 import Error from "./Error";
-import ScreenToStart from "./ScreenToStart";
+import StartScreen from "./ScreenToStart";
 import Question from "./Question";
 import NextButton from "./NextButton";
 import Progress from "./Progress";
@@ -11,11 +12,12 @@ import FinishScreen from "./FinishScreen";
 import Footer from "./Footer";
 import Timer from "./Timer";
 
-const secs_per_question = 30;
+const SECS_PER_QUESTION = 30;
 
 const initialState = {
   questions: [],
-  // "loading", "error", "ready","active","finshed"
+
+  // 'loading', 'error', 'ready', 'active', 'finished'
   status: "loading",
   index: 0,
   answer: null,
@@ -23,20 +25,29 @@ const initialState = {
   highscore: 0,
   secondsRemaining: null,
 };
+
 function reducer(state, action) {
   switch (action.type) {
-    case "dataRecived":
-      return { ...state, questions: action.payload, status: "ready" };
+    case "dataReceived":
+      return {
+        ...state,
+        questions: action.payload,
+        status: "ready",
+      };
     case "dataFailed":
-      return { ...state, status: "error" };
+      return {
+        ...state,
+        status: "error",
+      };
     case "start":
       return {
         ...state,
         status: "active",
-        secondsRemaining: state.questions.length * secs_per_question,
+        secondsRemaining: state.questions.length * SECS_PER_QUESTION,
       };
     case "newAnswer":
       const question = state.questions.at(state.index);
+
       return {
         ...state,
         answer: action.payload,
@@ -47,28 +58,33 @@ function reducer(state, action) {
       };
     case "nextQuestion":
       return { ...state, index: state.index + 1, answer: null };
-    case "finished":
+    case "finish":
       return {
         ...state,
         status: "finished",
         highscore:
           state.points > state.highscore ? state.points : state.highscore,
       };
-    case "reset":
-      return {
-        ...initialState,
-        status: "ready",
-        questions: state.questions,
-        highscore: state.highscore,
-      };
+    case "restart":
+      return { ...initialState, questions: state.questions, status: "ready" };
+    // return {
+    //   ...state,
+    //   points: 0,
+    //   highscore: 0,
+    //   index: 0,
+    //   answer: null,
+    //   status: "ready",
+    // };
+
     case "tick":
       return {
         ...state,
         secondsRemaining: state.secondsRemaining - 1,
         status: state.secondsRemaining === 0 ? "finished" : state.status,
       };
+
     default:
-      throw new Error("Action unknown");
+      throw new Error("Action unkonwn");
   }
 }
 
@@ -79,36 +95,29 @@ export default function App() {
   ] = useReducer(reducer, initialState);
 
   const numQuestions = questions.length;
-  const maxPossiblePoints = questions.reduce(
-    (prev, cur) => prev + cur.points,
-    0,
-  );
+  const maxPossiblePoints = Array.isArray(questions)
+    ? questions.reduce((prev, cur) => prev + cur.points, 0)
+    : 0;
+
 
   useEffect(function () {
-    async function fetchData() {
-      try {
-        const response = await fetch(
-          "https://gist.githubusercontent.com/abdelrahman-elkhateeb/2cb33237c29689ebd1eb7c8ae95c2082/raw/67daaa9dae205dcc287d12bbee97a6e060e56146/question.json",
-        );
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-        const data = await response.json();
-        dispatch({ type: "dataRecived", payload: data });
-      } catch (error) {
-        dispatch({ type: "dataFailed" });
-      }
-    }
-    fetchData();
+    fetch(
+      "https://gist.githubusercontent.com/abdelrahman-elkhateeb/2cb33237c29689ebd1eb7c8ae95c2082/raw/67daaa9dae205dcc287d12bbee97a6e060e56146/question.json",
+    )
+      .then((res) => res.json())
+      .then((data) => dispatch({ type: "dataReceived", payload: data }))
+      .catch((err) => dispatch({ type: "dataFailed" }));
   }, []);
+
   return (
     <div className="app">
       <Header />
+
       <Main>
         {status === "loading" && <Loader />}
         {status === "error" && <Error />}
         {status === "ready" && (
-          <ScreenToStart numQuestions={numQuestions} dispatch={dispatch} />
+          <StartScreen numQuestions={numQuestions} dispatch={dispatch} />
         )}
         {status === "active" && (
           <>
@@ -129,16 +138,16 @@ export default function App() {
               <NextButton
                 dispatch={dispatch}
                 answer={answer}
-                index={index}
                 numQuestions={numQuestions}
+                index={index}
               />
             </Footer>
           </>
         )}
         {status === "finished" && (
           <FinishScreen
-            maxPossiblePoints={maxPossiblePoints}
             points={points}
+            maxPossiblePoints={maxPossiblePoints}
             highscore={highscore}
             dispatch={dispatch}
           />

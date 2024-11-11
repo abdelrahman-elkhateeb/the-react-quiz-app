@@ -87,7 +87,9 @@ export default function App() {
   useEffect(function () {
     async function fetchData() {
       try {
-        const response = await fetch("../api/questions.js");
+        const response = await fetch(
+          "https://gist.githubusercontent.com/abdelrahman-elkhateeb/2cb33237c29689ebd1eb7c8ae95c2082/raw/67daaa9dae205dcc287d12bbee97a6e060e56146/question.json",
+        );
         if (!response.ok) {
           throw new Error("Network response was not ok");
         }

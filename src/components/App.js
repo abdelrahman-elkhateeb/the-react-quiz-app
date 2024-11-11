@@ -87,7 +87,7 @@ export default function App() {
   useEffect(function () {
     async function fetchData() {
       try {
-        const response = await fetch("https://k-quiz-app-react.netlify.app/.netlify/functions/fetchData");
+        const response = await fetch("../api/questions.js");
         if (!response.ok) {
           throw new Error("Network response was not ok");
         }

@@ -1,6 +1,8 @@
 import Options from "./Options";
 function Question({ question, dispatch, answer }) {
-  if (!question) return <p>Loading question...</p>;
+  if (!question) {
+    return null; // or display a loading spinner if data isn't ready
+  }
   return (
     <div>
       <h4>{question.question}</h4>

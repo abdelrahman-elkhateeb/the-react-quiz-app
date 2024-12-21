@@ -99,18 +99,25 @@ export default function App() {
     ? questions.reduce((prev, cur) => prev + cur.points, 0)
     : 0;
 
-
-  useEffect(function () {
+  useEffect(() => {
     fetch(
       "https://gist.githubusercontent.com/abdelrahman-elkhateeb/2cb33237c29689ebd1eb7c8ae95c2082/raw/67daaa9dae205dcc287d12bbee97a6e060e56146/question.json",
     )
       .then((res) => res.json())
-      .then((data) => dispatch({ type: "dataReceived", payload: data }))
-      .catch((err) => dispatch({ type: "dataFailed" }));
+      .then((data) => {
+        // Ensure the structure of the data is correct for your reducer
+        const formattedData = data.questions || data;
+        dispatch({ type: "dataReceived", payload: formattedData });
+      })
+      .catch((err) => {
+        dispatch({ type: "dataFailed" });
+        console.error("Error loading the data", err);
+      });
   }, []);
 
   return (
     <div className="app">
+
       <Header />
 
       <Main>
@@ -119,6 +126,7 @@ export default function App() {
         {status === "ready" && (
           <StartScreen numQuestions={numQuestions} dispatch={dispatch} />
         )}
+
         {status === "active" && (
           <>
             <Progress
